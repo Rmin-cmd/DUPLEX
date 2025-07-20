@@ -8,7 +8,7 @@ from dgl.base import NID, EID, dgl_warning
 from dgl.transforms import to_block
 from dgl.dataloading.base import *
 import pdb
-from mylogging import *
+from code_duplex.mylogging import *
 from dgl.dataloading.dataloader import *
 from dgl.dataloading.dataloader import _PrefetchingIter, _get_device
 import pandas
