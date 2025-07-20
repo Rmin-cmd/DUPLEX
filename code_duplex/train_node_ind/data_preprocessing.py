@@ -15,7 +15,7 @@ try:
 except:
     print('no stellargraph')
 import re
-from utils import undirected_label2directed_label
+from code_duplex.utils import undirected_label2directed_label
 import random
 
 import scipy.sparse as sp
