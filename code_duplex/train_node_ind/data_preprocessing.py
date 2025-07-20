@@ -5,7 +5,7 @@ import dgl
 import pandas as pd
 import numpy as np
 import torch
-from mylogging import *
+from code_duplex.mylogging import *
 from scipy.sparse import csr_matrix
 import scipy.sparse as sp
 import pdb
