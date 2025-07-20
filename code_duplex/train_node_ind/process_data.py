@@ -21,32 +21,42 @@ def ps_data(dataset):
     """
     
     print(os.listdir('../'))
-    save_path = '../node_data/%s/'%(dataset)
-    g = dp.load_dataset('../../data/%s.npz'%(dataset))
+    parent = os.path.dirname(os.path.dirname(os.getcwd()))
+    save_path = os.path.dirname(os.getcwd())
+    # save_path = '../node_data/%s/'%(dataset)
+    save_path = os.path.join(save_path, 'node_data', '%s'%(dataset))
+    # g = dp.load_dataset('../../data/%s.npz'%(dataset))
+    g = dp.load_dataset(os.path.join(parent, 'data', '%s.npz'%(dataset)))
     A, X, z = g['A'], g['X'], g['z']
 
     graph = dgl.from_scipy(A)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    if not os.path.exists(save_path+'whole.graph.txt'):
-        dgl.data.utils.save_graphs(save_path+'whole.graph', graph)
+    # if not os.path.exists(save_path+'whole.graph.txt'):
+    if not os.path.exists(os.path.join(save_path, 'whole.graph.txt')):
+        # dgl.data.utils.save_graphs(save_path+'whole.graph', graph)
+        dgl.data.utils.save_graphs(os.path.join(save_path, 'whole.graph'), graph)
         edges = torch.zeros(graph.num_edges(),3)
         edges[:,0] = graph.edges()[0]
         edges[:,1] = graph.edges()[1]
         edges[:,2] = torch.ones((graph.num_edges(),))
-        np.savetxt(save_path+'whole.graph.txt',edges, fmt='%i')
+        # np.savetxt(save_path+'whole.graph.txt',edges, fmt='%i')
+        np.savetxt(os.path.join(save_path, 'whole.graph.txt'),edges, fmt='%i')
 
     nodes = graph.nodes()
     labels = torch.tensor(g['z'])
     attris = torch.tensor(g['X'].todense())
     print(attris.shape)
-    np.savetxt(save_path+'features.txt',attris, delimiter=',')
-    np.savetxt(save_path+'labels.txt', labels,fmt='%i')
+    # np.savetxt(save_path+'features.txt',attris, delimiter=',')
+    np.savetxt(os.path.join(save_path, 'features.txt'),attris, delimiter=',')
+    # np.savetxt(save_path+'labels.txt', labels,fmt='%i')
+    np.savetxt(os.path.join(save_path, 'labels.txt'), labels,fmt='%i')
 
     for seed in range(10):
         dp.split_data(args, nodes, labels, save_path, seed)
-    dp.get_train_edges(save_path+'whole.graph',save_path)
-    
+    # dp.get_train_edges(save_path+'whole.graph',save_path)
+    dp.get_train_edges(os.path.join(save_path, 'whole.graph'),save_path)
+
 for dataset in ['citeseer','cora_ml']:
     print(dataset)
     ps_data(dataset)
