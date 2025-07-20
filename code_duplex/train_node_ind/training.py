@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append('../')
-from ..model import DUPLEX_gat_in
+from model import DUPLEX_gat_in
 import numpy as np
 from dgl.base import NID, EID
 
@@ -11,7 +11,7 @@ import torch
 import pdb
 import argparse
 import time
-from ..train_node_trans.evaluation import cal_f1
+from train_node_trans.evaluation import cal_f1
 
 from data_preprocessing import load_graph_data_transductive, load_train_test_data, load_graph_data_inductive
 # from duplex.utils import superLoss
