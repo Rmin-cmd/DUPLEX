@@ -8,11 +8,13 @@ from dgl.base import NID, EID, dgl_warning
 from dgl.transforms import to_block
 from dgl.dataloading.base import *
 import pdb
-from duplex.mylogging import *
+from mylogging import *
 from dgl.dataloading.dataloader import *
 from dgl.dataloading.dataloader import _PrefetchingIter, _get_device
 import pandas
 from sklearn.metrics import roc_auc_score, accuracy_score, classification_report
+from dgl import sparse as dglsp
+import scipy.sparse as sp
 
 def undirected_label2directed_label(adj, edge_pairs, task, ratio):
     """
@@ -36,13 +38,39 @@ def undirected_label2directed_label(adj, edge_pairs, task, ratio):
     # Create a sparse tensor to mark the presence of edges
     values = torch.ones(len(new_edge_pairs))# select
     h = torch.sparse_coo_tensor(new_edge_pairs[:,:2].T, values, adj.shape)
+    # h = dglsp.spmatrix(h.coalesce().indices(), h.coalesce().values())
     m1 = adj.mul(h)+adj.T.mul(h)
+    # m1 = dglsp.mul(adj, h) + dglsp.mul(adj.T, h)
     m2 = adj.mul(h)-adj.T.mul(h)
-    
+    # m2 = dglsp.mul(adj, h) - dglsp.mul(adj.T, h)
+
+    # row1, row2 = m1.row, m2.row  # torch.Tensor of shape (nnz,)
+    # col1, col2 = m1.col, m2.col  # torch.Tensor of shape (nnz,)
+    # data1, data2 = m1.val, m2.val  # torch.Tensor of shape (nnz,)
+    #
+    # # move to CPU and convert to NumPy
+    # row1_np, row2_np = row1.cpu().numpy(),row2.cpu().numpy()
+    # col1_np, col2_np = col1.cpu().numpy(),col2.cpu().numpy()
+    # data1_np, data2_np = data1.cpu().numpy(),data2.cpu().numpy()
+    #
+    # # build a SciPy COO sparse matrix
+    # m1 = sp.coo_matrix(
+    #     (data1_np, (row1_np, col1_np)),
+    #     shape=m1.shape
+    # )
+    #
+    # m2 = sp.coo_matrix(
+    #     (data2_np, (row2_np, col2_np)),
+    #     shape=m2.shape
+    # )
+
     # here the order of edges no more exist
     type_1 = m1.coalesce().indices().T[m1.coalesce().values()==2.] # bidirected edge pairs(N,2)
+    # type_1 = m1.indices().T[m1.coalesce().values()==2.] # bidirected edge pairs(N,2)
     type_2 = m2.coalesce().indices().T[m2.coalesce().values()==1.] # positive edges
+    # type_2 = m2.indices().T[m2.coalesce().values()==1.] # positive edges
     type_3 = m2.coalesce().indices().T[m2.coalesce().values()==-1.] # reverse edges
+    # type_3 = m2.indices().T[m2.coalesce().values()==-1.] # reverse edges
     type_4 = new_edge_pairs[new_edge_pairs[:,2]==0][:,:2] # non-existent
     df = pandas.DataFrame({
         'src':type_1.min(dim=1).values.tolist()+type_2[:,0].tolist()+type_3[:,1].tolist()+type_4.min(dim=1).values.tolist(),

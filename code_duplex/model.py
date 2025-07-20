@@ -5,7 +5,7 @@ from torch.nn import functional as F
 import torch
 import pdb
 from dgl.nn import SAGEConv
-from duplex.gatconv import GATConv
+from gatconv import GATConv
 
 class DUPLEX_gat(nn.Module):
     def __init__(self, args):

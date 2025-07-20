@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append('../')
-from duplex.model import DUPLEX_gat_in
+from model import DUPLEX_gat_in
 import numpy as np
 from dgl.base import NID, EID
 
@@ -11,12 +11,12 @@ import torch
 import pdb
 import argparse
 import time
-from duplex.train_node_trans.evaluation import cal_f1
+from train_node_trans.evaluation import cal_f1
 
 from data_preprocessing import load_graph_data_transductive, load_train_test_data, load_graph_data_inductive
-from duplex.utils import superLoss
+# from duplex.utils import superLoss
 from dgl.base import NID, EID
-from duplex.mylogging import getLogger
+from mylogging import getLogger
 import warnings
 warnings.filterwarnings('ignore')
 import random
@@ -46,19 +46,19 @@ def set_random_seed(seed):
 # --------- parser ----------------
 parser = argparse.ArgumentParser()
 parser.add_argument('--m', type=str, default=None, dest = 'note', help='anything wants to note')
-parser.add_argument('--input_dim', type=int, default=128)
+parser.add_argument('--input_dim', type=int, default=2879)
 parser.add_argument('--negative_ratio', type=int, default=1, dest = 'negative_ratio', help='negative edges when training')
-parser.add_argument('--dataset', type=str, default='citeseer', dest = 'dataset', help='dataset name')
-parser.add_argument('--labels', type=int, default=None)
+parser.add_argument('--dataset', type=str, default='cora_ml', dest = 'dataset', help='dataset name')
+parser.add_argument('--labels', type=int, default=7)
 parser.add_argument('--seed', type=int, default=0, dest = 'seed', help='data seed')
 parser.add_argument('--save_log', type=str, default='', dest = 'save_log', help='True if save log and model, with name')
 parser.add_argument('--loss_decay', type=float, default=0, dest = 'loss_decay', help='weight decay per epoch')
 parser.add_argument('--learning_rate', type=float, default=1e-3)
 parser.add_argument('--weight_decay', type=float, default=1e-2)
-parser.add_argument('--fusion', type=str, default=None)
-parser.add_argument('--bc_size',type=int, default=4096)
-parser.add_argument('--n_layers',type=int, default=3)
-parser.add_argument('--use_model',type=str, default='DUPLEX')
+parser.add_argument('--fusion', type=str, default=1)
+parser.add_argument('--bc_size',type=int, default=2048*3)
+parser.add_argument('--n_layers',type=int, default=2)
+parser.add_argument('--use_model',type=str, default='DUPLEX_gat')
 parser.add_argument('--feature',type=str, default='init')
 parser.add_argument('--balance',type=int, default=0)
 parser.add_argument('--task',type=str, default='inductive')
@@ -71,7 +71,9 @@ saveing_args = {
     'save_model_path':"./train_node_ind/save_models/%s/%s/%i/"%(args.use_model, args.dataset,args.seed),
     'save_result_path':"./train_node_ind/save_models/%s/%s/%i/"%(args.use_model, args.dataset,args.seed),
     'training_path':'../node_data/%s/'%(args.dataset),
+    # 'training_path':'../data/%s/'%(args.dataset),
     'initial_path':'../node_data/%s/'%(args.dataset),
+    # 'initial_path':'../data/%s/'%(args.dataset),
     'log_path':"./train_node_ind/logs/%s/%s/%i/"%(args.use_model, args.dataset,args.seed),
 }
 
@@ -120,7 +122,7 @@ def main():
 
     # -------------- whole graph --------------
     for epoch in range(args.epochs): 
-        for step, (input_nodes, output_nodes, blocks) in enumerate(train_dataloader): 
+        for step, (input_nodes, output_nodes, blocks) in enumerate(train_dataloader):
             input_am, input_ph = blocks[0].srcdata['h'], blocks[0].srcdata['h']
             output_nodes = blocks[-1].dstdata[NID]
             output_labels = blocks[-1].dstdata['label']

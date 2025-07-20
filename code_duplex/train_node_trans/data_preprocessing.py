@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 import torch
-from duplex.mylogging import *
+from mylogging import *
 from scipy.sparse import csr_matrix
 import scipy.sparse as sp
 import pdb
@@ -12,7 +12,7 @@ try:
     from stellargraph.data import EdgeSplitter
 except:
     print('no stellargraph')
-from duplex.utils import undirected_label2directed_label
+from utils import undirected_label2directed_label
 
 import scipy.sparse as sp
 def load_dataset(file_name):

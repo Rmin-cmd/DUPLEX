@@ -166,7 +166,7 @@ class GATConv(nn.Module):
                         "calling `g = dgl.add_self_loop(g)` will resolve "
                         "the issue. Setting ``allow_zero_in_degree`` "
                         "to be `True` when constructing this module will "
-                        "suppress the check and let the code run."
+                        "suppress the check and let the code_duplex run."
                     )
 
             if isinstance(feat, tuple):

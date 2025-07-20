@@ -5,7 +5,7 @@ import dgl
 import pandas as pd
 import numpy as np
 import torch
-from duplex.mylogging import *
+from mylogging import *
 from scipy.sparse import csr_matrix
 import scipy.sparse as sp
 import pdb
@@ -15,7 +15,7 @@ try:
 except:
     print('no stellargraph')
 import re
-from duplex.utils import undirected_label2directed_label
+from utils import undirected_label2directed_label
 import random
 
 import scipy.sparse as sp
@@ -294,7 +294,7 @@ def load_graph_data_inductive(args):
     print('train_samples:',str(train_samples[:,1].unique(return_counts=True)))
     train_nids = train_samples[:,0]
     train_val_nids = torch.cat((train_nids, val_samples[:,0]),dim=0)
-    train_val_graph = dgl.node_subgraph(whole_graph, train_val_nids) # examples : 0, 5, 10, ...
+    train_val_graph = dgl.node_subgraph(whole_graph, train_val_nids.long()) # examples : 0, 5, 10, ...
     train_val_nodes = train_val_graph.ndata[dgl.NID] # 0,1,2,3,4,5,...
     # ---------- train graph ------
     train_val_graph.edata['exist'] = torch.tensor([1.]*train_val_graph.num_edges())
@@ -384,7 +384,7 @@ def load_train_test_data(args, whole_graph):
     else: 
         print('no test_file')
     test_nodes = test_samples[:,0].unique()
-    test_input_nodes, test_output_nodes, test_blocks = sampler.sample_blocks(whole_graph, test_nodes)
+    test_input_nodes, test_output_nodes, test_blocks = sampler.sample_blocks(whole_graph, test_nodes.long())
 
     val_file = '/'.join((args.training_path, 'val_nodes_'+str(args.seed)+'.txt'))
     if os.path.exists(val_file):
@@ -393,7 +393,7 @@ def load_train_test_data(args, whole_graph):
         print('no val_file')
     
     val_nodes = val_samples[:,0].unique()
-    val_input_nodes, val_output_nodes, val_blocks = sampler.sample_blocks(whole_graph, val_nodes)
+    val_input_nodes, val_output_nodes, val_blocks = sampler.sample_blocks(whole_graph, val_nodes.long())
 
     return train_samples, val_samples, val_blocks, test_samples, test_blocks
 

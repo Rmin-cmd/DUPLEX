@@ -22,7 +22,7 @@ def ps_data(dataset):
     
     print(os.listdir('../'))
     save_path = '../node_data/%s/'%(dataset)
-    g = dp.load_dataset('../data/%s.npz'%(dataset))
+    g = dp.load_dataset('../../data/%s.npz'%(dataset))
     A, X, z = g['A'], g['X'], g['z']
 
     graph = dgl.from_scipy(A)
