@@ -21,8 +21,8 @@ def ps_data(dataset):
     """
     
     print(os.listdir('../'))
-    parent = os.path.dirname(os.path.dirname(os.getcwd()))
-    save_path = os.path.dirname(os.getcwd())
+    parent = os.path.dirname(os.getcwd())
+    save_path = os.getcwd()
     # save_path = '../node_data/%s/'%(dataset)
     save_path = os.path.join(save_path, 'node_data', '%s'%(dataset))
     # g = dp.load_dataset('../../data/%s.npz'%(dataset))
